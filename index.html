@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UK Absence Tracker - GDB Legal Solutions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 30px 30px 25px 30px;
+            border-bottom: 4px solid #D4AF37;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            background: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 24px;
+            color: #2d2d2d;
+            letter-spacing: 1px;
+        }
+
+        .contact-info {
+            text-align: right;
+            font-size: 14px;
+        }
+
+        .contact-info a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .contact-info a:hover {
+            color: #D4AF37;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 15px;
+            opacity: 0.95;
+            line-height: 1.5;
+        }
+
+        .controls {
+            padding: 30px;
+            background: linear-gradient(135deg, #D4AF37 0%, #c4a030 100%);
+            border-bottom: 2px solid #4a4a4a;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .control-group {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .control-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2d2d2d;
+            font-size: 14px;
+        }
+
+        .control-group input {
+            padding: 12px 14px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 100%;
+            font-family: 'Montserrat', sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .control-group input:focus {
+            outline: none;
+            border-color: #D4AF37;
+        }
+
+        .control-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 6px;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .control-important {
+            background: #fff9e6;
+            border-left: 4px solid #E13A44;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 25px 30px;
+            background: #fff;
+        }
+
+        .card {
+            padding: 25px;
+            border-radius: 8px;
+            border: 2px solid;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .card.success {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+            border-color: #4caf50;
+        }
+
+        .card.error {
+            background: linear-gradient(135deg, #ffebee 0%, #fef5f6 100%);
+            border-color: #E13A44;
+        }
+
+        .card.neutral {
+            background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
+            border-color: #D4AF37;
+        }
+
+        .card-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 12px 0;
+            color: #2d2d2d;
+        }
+
+        .card-label {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .card-status {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .spreadsheet-container {
+            padding: 0 30px 30px 30px;
+            overflow-x: auto;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px 0;
+            border-bottom: 2px solid #D4AF37;
+        }
+
+        .section-header h3 {
+            color: #4a4a4a;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 13px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 14px 10px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #fffdf5;
+        }
+
+        .auto-absence-row {
+            background: #fff9e6;
+        }
+
+        .input-cell {
+            width: 100%;
+            border: 2px solid #ddd;
+            padding: 8px;
+            font-size: 13px;
+            border-radius: 4px;
+            font-family: 'Montserrat', sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .input-cell:focus {
+            outline: none;
+            border-color: #D4AF37;
+        }
+
+        .calc-cell {
+            font-weight: 600;
+            color: #4a4a4a;
+            font-size: 14px;
+        }
+
+        .btn-delete {
+            background: #E13A44;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            transition: background 0.3s;
+        }
+
+        .btn-delete:hover {
+            background: #c12d36;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #D4AF37 0%, #c4a030 100%);
+            color: #2d2d2d;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            margin-top: 15px;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+        }
+
+        .info-box {
+            margin: 20px 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
+            border-left: 5px solid #D4AF37;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .info-box h3 {
+            margin-bottom: 15px;
+            color: #4a4a4a;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-box li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #555;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .info-box li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #D4AF37;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .info-box.important {
+            background: linear-gradient(135deg, #ffe8ea 0%, #fff0f1 100%);
+            border-left: 5px solid #E13A44;
+        }
+
+        .info-box.important h3 {
+            color: #E13A44;
+        }
+
+        .info-box.important li:before {
+            color: #E13A44;
+            content: "➤";
+        }
+
+        .rolling-periods {
+            margin: 20px 30px;
+            padding: 25px;
+            background: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .rolling-periods h3 {
+            margin-bottom: 18px;
+            color: #4a4a4a;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .period-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 18px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .period-item.safe {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+
+        .period-item.warning {
+            background: #ffebee;
+            border-left: 4px solid #E13A44;
+        }
+
+        .period-label {
+            color: #333;
+        }
+
+        .period-value {
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        .footer {
+            background: #2d2d2d;
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .footer a {
+            color: #D4AF37;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-divider {
+            margin: 15px auto;
+            width: 60px;
+            height: 2px;
+            background: #D4AF37;
+        }
+
+        .disclaimer {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #555;
+            font-size: 12px;
+            color: #aaa;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .contact-info {
+                text-align: left;
+            }
+
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .spreadsheet-container {
+                padding: 0 15px 15px 15px;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 8px 4px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .card-value {
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <div class="logo-section">
+                    <div class="logo">GDB LEGAL</div>
+                </div>
+                <div class="contact-info">
+                    <a href="tel:+441135340925">Tel: (+44) 0113 534 0925</a>
+                    <a href="mailto:info@gdblegal.co.uk">info@gdblegal.co.uk</a>
+                    <a href="https://www.gdblegal.co.uk" target="_blank">www.gdblegal.co.uk</a>
+                </div>
+            </div>
+            <h1>UK Absence Tracker - SET(O) Application</h1>
+            <p>Track your absences from the UK and check eligibility for Settlement applications</p>
+        </div>
+
+        <div class="controls">
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label for="entryDate">Date of Entry to UK:</label>
+                    <input type="date" id="entryDate">
+                    <div class="control-hint">When you first entered the UK on your current visa route</div>
+                </div>
+                
+                <div class="control-group">
+                    <label for="decisionDate">Visa Decision Date (Optional):</label>
+                    <input type="date" id="decisionDate">
+                    <div class="control-hint">Date your visa was granted/approved</div>
+                    <div class="control-important">
+                        <strong>Important:</strong> If you entered the UK after your visa decision date, the time between decision and entry is automatically counted as an absence.
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label for="applicationDate">Planned Application Submission Date:</label>
+                    <input type="date" id="applicationDate">
+                    <div class="control-hint">
+                        <strong>💡 Tip:</strong> Try different submission dates to find the optimal time to apply and minimize your absences within the 5-year period.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-cards" id="summaryCards">
+            <!-- Summary cards will be inserted here -->
+        </div>
+
+        <div class="spreadsheet-container">
+            <div class="section-header">
+                <h3>Absence Records</h3>
+            </div>
+            <table id="absenceTable">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Start Date</th>
+                        <th style="width: 15%;">End Date</th>
+                        <th style="width: 10%;">Days</th>
+                        <th style="width: 30%;">Reason</th>
+                        <th style="width: 15%;">In 5-Year Period?</th>
+                        <th style="width: 10%;">Delete</th>
+                    </tr>
+                </thead>
+                <tbody id="absenceTableBody">
+                    <!-- Rows will be inserted here -->
+                </tbody>
+            </table>
+            <button class="btn-add" onclick="addRow()">+ Add New Absence</button>
+        </div>
+
+        <div class="rolling-periods" id="rollingPeriodsSection" style="display: none;">
+            <h3>Highest Absence Periods (Rolling 12 Months)</h3>
+            <div id="rollingPeriodsList"></div>
+        </div>
+
+        <div class="info-box important">
+            <h3>How to Use This Tool</h3>
+            <ul>
+                <li>Enter your UK entry date and visa decision date (if different) in the fields above</li>
+                <li>Set your planned application submission date - you can change this to find the best time to apply</li>
+                <li>Add all periods when you were absent from the UK using the table below</li>
+                <li>The tool automatically calculates if you meet the SET(O) absence requirements</li>
+                <li>If you entered the UK after your visa decision, that period is automatically counted as an absence</li>
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <h3>SET(O) Absence Requirements</h3>
+            <ul>
+                <li>No more than 180 days absent in any rolling 12-month period during the 5-year qualifying period</li>
+                <li>No more than 540 days absent in total during the entire 5-year qualifying period</li>
+                <li>Both requirements must be met to be eligible for settlement</li>
+                <li>The 5-year period is calculated backwards from your application submission date</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <strong>GDB Legal Solutions</strong>
+            <div class="footer-divider"></div>
+            <p>Boutique Immigration Consultancy Firm</p>
+            <p>Providing Specialist Immigration Support for Individuals or Organisations</p>
+            <p style="margin-top: 10px;">
+                <a href="mailto:info@gdblegal.co.uk">info@gdblegal.co.uk</a> | 
+                <a href="https://www.gdblegal.co.uk" target="_blank">www.gdblegal.co.uk</a>
+            </p>
+            <div class="disclaimer">
+                © 2025 GDB Legal | For guidance only<br>
+                Authorised to provide Immigration Advice at IAA Level 1 | Registration number: F201700019<br>
+                This tool provides guidance only and does not constitute legal advice. 
+                Please consult with an immigration adviser for your specific circumstances.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let absences = [];
+        let rowCounter = 0;
+
+        // Set today's date as default
+        document.getElementById('applicationDate').valueAsDate = new Date();
+
+        function calculateDays(startDate, endDate) {
+            if (!startDate || !endDate) return 0;
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            if (end < start) return 0;
+            return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        }
+
+        function isInFiveYearPeriod(startDate, applicationDate) {
+            if (!startDate || !applicationDate) return false;
+            const start = new Date(startDate);
+            const appDate = new Date(applicationDate);
+            const fiveYearsAgo = new Date(appDate);
+            fiveYearsAgo.setFullYear(appDate.getFullYear() - 5);
+            return start >= fiveYearsAgo && start <= appDate;
+        }
+
+        function addRow(isAuto = false, startDate = '', endDate = '', reason = '') {
+            const id = rowCounter++;
+            absences.push({
+                id: id,
+                startDate: startDate,
+                endDate: endDate,
+                reason: reason,
+                days: calculateDays(startDate, endDate),
+                isAuto: isAuto
+            });
+            renderTable();
+            if (!isAuto) {
+                setTimeout(() => {
+                    const inputs = document.querySelectorAll(`#row-${id} .input-cell`);
+                    if (inputs.length > 0) inputs[0].focus();
+                }, 0);
+            }
+        }
+
+        function deleteRow(id) {
+            const absence = absences.find(a => a.id === id);
+            if (absence && absence.isAuto) {
+                alert('Cannot delete automatically calculated absence. Change the visa decision date or entry date to remove this.');
+                return;
+            }
+            absences = absences.filter(a => a.id !== id);
+            renderTable();
+            calculateSummary();
+        }
+
+        function updateRow(id, field, value) {
+            const absence = absences.find(a => a.id === id);
+            if (absence) {
+                if (absence.isAuto) {
+                    alert('Cannot edit automatically calculated absence. This represents the period between your visa decision and UK entry.');
+                    renderTable();
+                    return;
+                }
+                absence[field] = value;
+                if (field === 'startDate' || field === 'endDate') {
+                    absence.days = calculateDays(absence.startDate, absence.endDate);
+                }
+                renderTable();
+                calculateSummary();
+            }
+        }
+
+        function updateAutoAbsence() {
+            // Remove existing auto absence
+            absences = absences.filter(a => !a.isAuto);
+            
+            const decisionDate = document.getElementById('decisionDate').value;
+            const entryDate = document.getElementById('entryDate').value;
+            
+            if (decisionDate && entryDate) {
+                const decision = new Date(decisionDate);
+                const entry = new Date(entryDate);
+                
+                if (entry > decision) {
+                    // Add 1 day to decision date for start, entry date is end
+                    const absenceStart = new Date(decision);
+                    absenceStart.setDate(absenceStart.getDate() + 1);
+                    
+                    addRow(true, 
+                        absenceStart.toISOString().split('T')[0], 
+                        entryDate, 
+                        'Auto-calculated: Between visa decision and UK entry'
+                    );
+                }
+            }
+            
+            renderTable();
+            calculateSummary();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('absenceTableBody');
+            const applicationDate = document.getElementById('applicationDate').value;
+            
+            if (absences.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No absences recorded. The tool will automatically add any period between visa decision and UK entry. Click "Add New Absence" to add manual records.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = absences.map(absence => {
+                const inPeriod = isInFiveYearPeriod(absence.startDate, applicationDate);
+                const rowClass = absence.isAuto ? 'auto-absence-row' : '';
+                const disabled = absence.isAuto ? 'disabled' : '';
+                
+                return `
+                    <tr id="row-${absence.id}" class="${rowClass}">
+                        <td>
+                            <input type="date" 
+                                   class="input-cell" 
+                                   value="${absence.startDate}"
+                                   ${disabled}
+                                   onchange="updateRow(${absence.id}, 'startDate', this.value)">
+                        </td>
+                        <td>
+                            <input type="date" 
+                                   class="input-cell" 
+                                   value="${absence.endDate}"
+                                   ${disabled}
+                                   onchange="updateRow(${absence.id}, 'endDate', this.value)">
+                        </td>
+                        <td class="calc-cell">${absence.days}</td>
+                        <td>
+                            <input type="text" 
+                                   class="input-cell" 
+                                   value="${absence.reason}"
+                                   placeholder="e.g., Holiday, Business trip"
+                                   ${disabled}
+                                   onchange="updateRow(${absence.id}, 'reason', this.value)">
+                        </td>
+                        <td style="color: ${inPeriod ? '#4caf50' : '#999'}; font-weight: 600;">
+                            ${inPeriod ? '✓ Yes' : '✗ No'}
+                        </td>
+                        <td>
+                            <button class="btn-delete" onclick="deleteRow(${absence.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function calculateSummary() {
+            const applicationDate = document.getElementById('applicationDate').value;
+            const entryDate = document.getElementById('entryDate').value;
+            
+            if (!applicationDate) {
+                document.getElementById('summaryCards').innerHTML = `
+                    <div class="card neutral">
+                        <div class="card-label">Please set your planned application submission date to see calculations</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const appDate = new Date(applicationDate);
+            const fiveYearsAgo = new Date(appDate);
+            fiveYearsAgo.setFullYear(appDate.getFullYear() - 5);
+
+            const relevantAbsences = absences.filter(a => {
+                if (!a.startDate) return false;
+                return isInFiveYearPeriod(a.startDate, applicationDate);
+            });
+
+            const totalDays = relevantAbsences.reduce((sum, a) => sum + a.days, 0);
+
+            let maxDaysIn12Months = 0;
+            const rollingPeriods = [];
+
+            if (relevantAbsences.length > 0) {
+                const currentDate = new Date(fiveYearsAgo);
+                const checkDates = [];
+                
+                while (currentDate <= appDate) {
+                    checkDates.push(new Date(currentDate));
+                    currentDate.setDate(currentDate.getDate() + 7);
+                }
+                
+                relevantAbsences.forEach(a => {
+                    if (a.endDate) checkDates.push(new Date(a.endDate));
+                });
+
+                checkDates.forEach(endDate => {
+                    const startDate = new Date(endDate);
+                    startDate.setFullYear(endDate.getFullYear() - 1);
+                    startDate.setDate(endDate.getDate() + 1);
+
+                    let daysInPeriod = 0;
+
+                    relevantAbsences.forEach(absence => {
+                        if (!absence.startDate || !absence.endDate) return;
+                        
+                        const absStart = new Date(absence.startDate);
+                        const absEnd = new Date(absence.endDate);
+
+                        if (absStart <= endDate && absEnd >= startDate) {
+                            const overlapStart = absStart > startDate ? absStart : startDate;
+                            const overlapEnd = absEnd < endDate ? absEnd : endDate;
+                            const overlapDays = Math.ceil((overlapEnd - overlapStart) / (1000 * 60 * 60 * 24)) + 1;
+                            daysInPeriod += overlapDays;
+                        }
+                    });
+
+                    if (daysInPeriod > 0) {
+                        rollingPeriods.push({
+                            endDate: endDate,
+                            days: daysInPeriod
+                        });
+                    }
+
+                    maxDaysIn12Months = Math.max(maxDaysIn12Months, daysInPeriod);
+                });
+            }
+
+            const meets180 = maxDaysIn12Months <= 180;
+            const meets540 = totalDays <= 540;
+            const meetsAll = meets180 && meets540;
+
+            let fiveYearPeriodText = '';
+            if (entryDate) {
+                const entry = new Date(entryDate);
+                if (entry > fiveYearsAgo) {
+                    fiveYearPeriodText = `<div class="card-label" style="margin-top: 10px; color: #E13A44; font-weight: 600;">⚠ Note: Your UK entry date (${entry.toLocaleDateString('en-GB')}) is after the 5-year period start. Consider waiting longer before applying.</div>`;
+                }
+            }
+
+            document.getElementById('summaryCards').innerHTML = `
+                <div class="card ${meets180 ? 'success' : 'error'}">
+                    <div class="card-label">Max Days in Any 12-Month Period</div>
+                    <div class="card-value">${maxDaysIn12Months}</div>
+                    <div class="card-label">Must be ≤ 180 days</div>
+                    <div class="card-status" style="color: ${meets180 ? '#4caf50' : '#E13A44'};">
+                        ${meets180 ? '✓ Requirement Met' : '✗ Requirement Not Met'}
+                    </div>
+                </div>
+                <div class="card ${meets540 ? 'success' : 'error'}">
+                    <div class="card-label">Total Days in 5-Year Period</div>
+                    <div class="card-value">${totalDays}</div>
+                    <div class="card-label">Must be ≤ 540 days</div>
+                    <div class="card-status" style="color: ${meets540 ? '#4caf50' : '#E13A44'};">
+                        ${meets540 ? '✓ Requirement Met' : '✗ Requirement Not Met'}
+                    </div>
+                    ${fiveYearPeriodText}
+                </div>
+                <div class="card ${meetsAll ? 'success' : 'error'}">
+                    <div class="card-label">Overall Eligibility Status</div>
+                    <div class="card-value" style="font-size: 24px;">${meetsAll ? 'ELIGIBLE' : 'NOT ELIGIBLE'}</div>
+                    <div class="card-label">SET(O) Absence Requirements</div>
+                    <div class="card-status" style="color: ${meetsAll ? '#4caf50' : '#E13A44'};">
+                        ${meetsAll ? '✓ Both Requirements Met' : '✗ Requirements Not Met'}
+                    </div>
+                </div>
+            `;
+
+            if (rollingPeriods.length > 0) {
+                const topPeriods = rollingPeriods
+                    .sort((a, b) => b.days - a.days)
+                    .slice(0, 10);
+
+                document.getElementById('rollingPeriodsSection').style.display = 'block';
+                document.getElementById('rollingPeriodsList').innerHTML = topPeriods.map(period => `
+                    <div class="period-item ${period.days > 180 ? 'warning' : 'safe'}">
+                        <span class="period-label">12 months ending ${period.endDate.toLocaleDateString('en-GB')}</span>
+                        <span class="period-value" style="color: ${period.days > 180 ? '#E13A44' : '#4caf50'};">
+                            ${period.days} days
+                        </span>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('rollingPeriodsSection').style.display = 'none';
+            }
+        }
+
+        document.getElementById('applicationDate').addEventListener('change', () => {
+            renderTable();
+            calculateSummary();
+        });
+
+        document.getElementById('entryDate').addEventListener('change', () => {
+            updateAutoAbsence();
+        });
+
+        document.getElementById('decisionDate').addEventListener('change', () => {
+            updateAutoAbsence();
+        });
+
+        renderTable();
+        calculateSummary();
+    </script>
+</body>
+</html>
