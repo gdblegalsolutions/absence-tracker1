@@ -90,6 +90,13 @@
 
         input[type="date"],
         input[type="number"],
+        select,
+        input[type="checkbox"] {
+            font-family: 'Avenir Next', 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        input[type="date"],
+        input[type="number"],
         select {
             width: 100%;
             padding: 14px 18px;
@@ -98,7 +105,6 @@
             font-size: 15px;
             transition: all 0.3s ease;
             background: white;
-            font-family: 'Avenir Next', 'Helvetica Neue', Arial, sans-serif;
         }
 
         input[type="date"]:focus,
@@ -107,6 +113,28 @@
             outline: none;
             border-color: #000000;
             box-shadow: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f8f8;
+            border: 1px solid #e0e0e0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
         }
 
         .button {
@@ -165,6 +193,11 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
+        .trip-item.permitted {
+            background: #e8f5e9;
+            border-left: 3px solid #4caf50;
+        }
+
         .trip-info {
             flex: 1;
         }
@@ -181,6 +214,17 @@
             font-size: 14px;
         }
 
+        .trip-badge {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 0;
+            font-size: 12px;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+
         .trip-days {
             background: #000000;
             color: white;
@@ -189,6 +233,10 @@
             font-weight: 400;
             margin-right: 15px;
             letter-spacing: 0.5px;
+        }
+
+        .trip-days.permitted {
+            background: #4caf50;
         }
 
         .remove-btn {
@@ -246,6 +294,12 @@
         .result-item .value {
             font-size: 32px;
             font-weight: 300;
+        }
+
+        .result-item .sub-value {
+            font-size: 16px;
+            margin-top: 10px;
+            opacity: 0.9;
         }
 
         .status {
@@ -341,6 +395,32 @@
         .highlight-box strong {
             color: #000000;
         }
+
+        .permitted-reasons {
+            background: #e8f5e9;
+            border-left: 3px solid #4caf50;
+            padding: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .permitted-reasons h4 {
+            color: #2e7d32;
+            margin-bottom: 12px;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .permitted-reasons ul {
+            margin-left: 20px;
+        }
+
+        .permitted-reasons li {
+            color: #1b5e20;
+            margin-bottom: 8px;
+            line-height: 1.6;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -349,13 +429,24 @@
             <!-- Information Section -->
             <div class="section">
                 <div class="info-box">
-                    <h3>SET(O) Absence Requirements</h3>
-                    <p>For your SET(O) application to be successful, you must meet BOTH of these requirements:</p>
+                    <h3>SET(O) Absence Requirements for 5-Year Route to ILR</h3>
+                    <p>For your SET(O) application to be successful, you must meet ALL of these requirements:</p>
                     <ul>
-                        <li><strong>No more than 180 days</strong> total absence during the 5-year qualifying period</li>
-                        <li><strong>No single absence longer than 90 consecutive days</strong></li>
+                        <li><strong>No more than 180 days</strong> absence in any 12-month rolling period</li>
+                        <li><strong>No single continuous absence longer than 180 days</strong> for any leave granted after 11 January 2018</li>
+                        <li><strong>Total absences must not exceed 450 days</strong> over the entire 5-year qualifying period</li>
                     </ul>
-                    <p style="margin-top: 15px;"><strong>Qualifying Period:</strong> 5 years immediately before your application date</p>
+                    <p style="margin-top: 15px;"><strong>Important:</strong> Absences before 11 January 2018 are counted in separate consecutive 12-month periods. Absences after 11 January 2018 are calculated on a rolling basis.</p>
+                </div>
+
+                <div class="permitted-reasons">
+                    <h4>Permitted Absences (These DO NOT count towards your limits):</h4>
+                    <ul>
+                        <li>Assisting with national or international humanitarian or environmental crisis overseas</li>
+                        <li>Travel disruption due to natural disaster, military conflict or pandemic</li>
+                        <li>Compelling and compassionate personal circumstances (e.g., life-threatening illness of applicant or close family member)</li>
+                        <li>Research activity for Skilled Workers in specified occupation codes (2111-2119, 2161-2162, 2311)</li>
+                    </ul>
                 </div>
             </div>
 
@@ -383,6 +474,7 @@
                     <p id="periodRange"></p>
                     <p style="margin-top: 15px;"><strong>Time Since Entry:</strong> <span id="timeSinceEntry"></span></p>
                     <p><strong>Time Since Last Decision:</strong> <span id="timeSinceDecision"></span></p>
+                    <p style="margin-top: 15px; color: #856404;" id="jan2018Notice"></p>
                 </div>
             </div>
 
@@ -399,6 +491,11 @@
                         <option value="Medical">Medical Reasons</option>
                         <option value="Other">Other</option>
                     </select>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="isPermitted">
+                    <label for="isPermitted">This absence is for a permitted reason (humanitarian crisis, travel disruption, compelling circumstances, or approved research activity) and should NOT count towards my absence limits</label>
                 </div>
 
                 <div class="grid-2">
@@ -432,8 +529,10 @@
                 <div class="warning">
                     <p><strong>Important Notes:</strong></p>
                     <p>• Both departure and arrival days count as full absence days</p>
+                    <p>• Absences before 11 January 2018 are counted in separate consecutive 12-month periods</p>
+                    <p>• Absences after 11 January 2018 are calculated on a rolling 12-month basis</p>
                     <p>• Keep all travel documents (boarding passes, tickets, passport stamps) as evidence</p>
-                    <p>• Absences for serious or compelling reasons may be treated differently</p>
+                    <p>• Keep evidence for any permitted absences (medical certificates, employer letters, etc.)</p>
                     <p>• This calculator is for guidance only and does not constitute official legal advice</p>
                     <p>• For specialist immigration advice, please contact our team</p>
                 </div>
@@ -443,6 +542,7 @@
 
     <script>
         let trips = [];
+        const JAN_11_2018 = new Date('2018-01-11');
 
         function updateQualifyingPeriod() {
             const entryDate = document.getElementById('entryDate').value;
@@ -457,9 +557,19 @@
 
                 const periodDiv = document.getElementById('qualifyingPeriod');
                 const rangeP = document.getElementById('periodRange');
+                const jan2018Notice = document.getElementById('jan2018Notice');
                 
                 periodDiv.classList.remove('hidden');
                 rangeP.innerHTML = `<strong>${formatDate(fiveYearsAgo)}</strong> to <strong>${formatDate(appDateObj)}</strong>`;
+
+                // Check if qualifying period spans the Jan 11, 2018 date
+                if (fiveYearsAgo < JAN_11_2018 && appDateObj >= JAN_11_2018) {
+                    jan2018Notice.textContent = '⚠️ Your qualifying period includes time both before and after 11 January 2018. Different calculation methods apply to each period.';
+                } else if (fiveYearsAgo < JAN_11_2018) {
+                    jan2018Notice.textContent = '⚠️ Your qualifying period is entirely before 11 January 2018. Absences will be counted in consecutive 12-month periods.';
+                } else {
+                    jan2018Notice.textContent = '✓ Your qualifying period is after 11 January 2018. Absences will be calculated on a rolling 12-month basis.';
+                }
 
                 if (entryDate) {
                     const entryDateObj = new Date(entryDate);
@@ -490,6 +600,7 @@
             const reason = document.getElementById('reason').value;
             const departDate = document.getElementById('departDate').value;
             const returnDate = document.getElementById('returnDate').value;
+            const isPermitted = document.getElementById('isPermitted').checked;
 
             if (!reason || !departDate || !returnDate) {
                 alert('Please fill in all fields');
@@ -511,7 +622,8 @@
                 reason,
                 departDate,
                 returnDate,
-                days
+                days,
+                isPermitted
             };
 
             trips.push(trip);
@@ -528,13 +640,14 @@
             }
 
             list.innerHTML = trips.map(trip => `
-                <div class="trip-item">
+                <div class="trip-item ${trip.isPermitted ? 'permitted' : ''}">
                     <div class="trip-info">
                         <strong>${trip.reason}</strong>
                         <span>${formatDate(new Date(trip.departDate))} → ${formatDate(new Date(trip.returnDate))}</span>
+                        ${trip.isPermitted ? '<div class="trip-badge">PERMITTED ABSENCE</div>' : ''}
                     </div>
                     <div style="display: flex; align-items: center; gap: 15px;">
-                        <div class="trip-days">${trip.days} days</div>
+                        <div class="trip-days ${trip.isPermitted ? 'permitted' : ''}">${trip.days} days</div>
                         <button class="remove-btn" onclick="removeTrip(${trip.id})">Remove</button>
                     </div>
                 </div>
@@ -550,6 +663,7 @@
             document.getElementById('reason').value = '';
             document.getElementById('departDate').value = '';
             document.getElementById('returnDate').value = '';
+            document.getElementById('isPermitted').checked = false;
         }
 
         function calculate() {
@@ -572,15 +686,113 @@
                 return;
             }
 
-            const totalDays = trips.reduce((sum, trip) => sum + trip.days, 0);
-            const longestTrip = Math.max(...trips.map(trip => trip.days));
+            const appDateObj = new Date(appDate);
+            const fiveYearsAgo = new Date(appDateObj);
+            fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+            fiveYearsAgo.setDate(fiveYearsAgo.getDate() + 1);
+
+            // Separate trips into permitted and countable
+            const permittedTrips = trips.filter(t => t.isPermitted);
+            const countableTrips = trips.filter(t => !t.isPermitted);
+
+            const totalPermittedDays = permittedTrips.reduce((sum, trip) => sum + trip.days, 0);
+            const totalCountableDays = countableTrips.reduce((sum, trip) => sum + trip.days, 0);
+            const totalAllDays = totalPermittedDays + totalCountableDays;
+
+            // Calculate longest single absence (countable only)
+            const longestTrip = countableTrips.length > 0 ? Math.max(...countableTrips.map(trip => trip.days)) : 0;
+
+            // Check rolling 12-month periods for post-Jan 2018 absences
+            let maxRolling12Months = 0;
+            let maxRollingPeriod = '';
             
-            const meetsTotal = totalDays <= 180;
-            const meetsLongest = longestTrip <= 90;
-            const passes = meetsTotal && meetsLongest;
+            const postJan2018Trips = countableTrips.filter(t => new Date(t.departDate) >= JAN_11_2018);
+            
+            if (postJan2018Trips.length > 0) {
+                for (let trip of postJan2018Trips) {
+                    const tripStart = new Date(trip.departDate);
+                    const twelveMonthsLater = new Date(tripStart);
+                    twelveMonthsLater.setFullYear(twelveMonthsLater.getFullYear() + 1);
+                    
+                    const tripsInPeriod = countableTrips.filter(t => {
+                        const tStart = new Date(t.departDate);
+                        const tEnd = new Date(t.returnDate);
+                        return (tStart >= tripStart && tStart < twelveMonthsLater) ||
+                               (tEnd >= tripStart && tEnd < twelveMonthsLater) ||
+                               (tStart < tripStart && tEnd >= twelveMonthsLater);
+                    });
+                    
+                    const daysInPeriod = tripsInPeriod.reduce((sum, t) => {
+                        const tStart = new Date(t.departDate);
+                        const tEnd = new Date(t.returnDate);
+                        const periodStart = tStart < tripStart ? tripStart : tStart;
+                        const periodEnd = tEnd > twelveMonthsLater ? twelveMonthsLater : tEnd;
+                        const days = Math.floor((periodEnd - periodStart) / (1000 * 60 * 60 * 24)) + 1;
+                        return sum + days;
+                    }, 0);
+                    
+                    if (daysInPeriod > maxRolling12Months) {
+                        maxRolling12Months = daysInPeriod;
+                        maxRollingPeriod = `${formatDate(tripStart)} to ${formatDate(twelveMonthsLater)}`;
+                    }
+                }
+            }
+
+            // Check consecutive 12-month periods for pre-Jan 2018 absences
+            let maxConsecutive12Months = 0;
+            let maxConsecutivePeriod = '';
+            
+            const preJan2018Trips = countableTrips.filter(t => new Date(t.departDate) < JAN_11_2018);
+            
+            if (preJan2018Trips.length > 0) {
+                let currentDate = new Date(fiveYearsAgo);
+                while (currentDate < JAN_11_2018) {
+                    const periodEnd = new Date(currentDate);
+                    periodEnd.setFullYear(periodEnd.getFullYear() + 1);
+                    
+                    const tripsInPeriod = countableTrips.filter(t => {
+                        const tStart = new Date(t.departDate);
+                        const tEnd = new Date(t.returnDate);
+                        return (tStart >= currentDate && tStart < periodEnd) ||
+                               (tEnd >= currentDate && tEnd < periodEnd) ||
+                               (tStart < currentDate && tEnd >= periodEnd);
+                    });
+                    
+                    const daysInPeriod = tripsInPeriod.reduce((sum, t) => {
+                        const tStart = new Date(t.departDate);
+                        const tEnd = new Date(t.returnDate);
+                        const periodStart = tStart < currentDate ? currentDate : tStart;
+                        const actualPeriodEnd = periodEnd < JAN_11_2018 ? periodEnd : JAN_11_2018;
+                        const periodEndDate = tEnd > actualPeriodEnd ? actualPeriodEnd : tEnd;
+                        const days = Math.floor((periodEndDate - periodStart) / (1000 * 60 * 60 * 24)) + 1;
+                        return sum + days;
+                    }, 0);
+                    
+                    if (daysInPeriod > maxConsecutive12Months) {
+                        maxConsecutive12Months = daysInPeriod;
+                        maxConsecutivePeriod = `${formatDate(currentDate)} to ${formatDate(periodEnd < JAN_11_2018 ? periodEnd : JAN_11_2018)}`;
+                    }
+                    
+                    currentDate = periodEnd;
+                }
+            }
+
+            // Determine if requirements are met
+            const meetsTotal = totalCountableDays <= 450;
+            const meetsRolling = maxRolling12Months <= 180;
+            const meetsConsecutive = maxConsecutive12Months <= 180;
+            const meetsLongest = longestTrip <= 180;
+            
+            const passes = meetsTotal && meetsRolling && meetsConsecutive && meetsLongest;
 
             const resultsDiv = document.getElementById('results');
             resultsDiv.classList.remove('hidden');
+
+            let warningMessages = [];
+            if (!meetsTotal) warningMessages.push(`You have exceeded the 450-day total limit by ${totalCountableDays - 450} days.`);
+            if (!meetsRolling && maxRolling12Months > 0) warningMessages.push(`You exceeded the 180-day rolling 12-month limit (${maxRolling12Months} days in period: ${maxRollingPeriod}).`);
+            if (!meetsConsecutive && maxConsecutive12Months > 0) warningMessages.push(`You exceeded the 180-day consecutive 12-month limit for pre-Jan 2018 absences (${maxConsecutive12Months} days in period: ${maxConsecutivePeriod}).`);
+            if (!meetsLongest) warningMessages.push(`Your longest single absence (${longestTrip} days) exceeds the 180-day limit.`);
 
             resultsDiv.innerHTML = `
                 <div class="results">
@@ -589,19 +801,46 @@
                     <div class="result-item">
                         <strong>Total Number of Absences</strong>
                         <div class="value">${trips.length}</div>
+                        <div class="sub-value">${countableTrips.length} countable | ${permittedTrips.length} permitted</div>
                     </div>
 
                     <div class="result-item">
-                        <strong>Total Days Outside UK</strong>
-                        <div class="value">${totalDays} days</div>
-                        <div style="margin-top: 10px; opacity: 0.9;">Limit: 180 days ${meetsTotal ? '✓' : '✗'}</div>
+                        <strong>Total Countable Days Outside UK</strong>
+                        <div class="value">${totalCountableDays} days</div>
+                        <div style="margin-top: 10px; opacity: 0.9;">Limit: 450 days over 5 years ${meetsTotal ? '✓' : '✗'}</div>
                     </div>
+
+                    ${totalPermittedDays > 0 ? `
+                    <div class="result-item">
+                        <strong>Total Permitted Absence Days (Not Counted)</strong>
+                        <div class="value">${totalPermittedDays} days</div>
+                        <div style="margin-top: 10px; opacity: 0.9;">These do not count towards your limits</div>
+                    </div>
+                    ` : ''}
 
                     <div class="result-item">
                         <strong>Longest Single Absence</strong>
                         <div class="value">${longestTrip} days</div>
-                        <div style="margin-top: 10px; opacity: 0.9;">Limit: 90 consecutive days ${meetsLongest ? '✓' : '✗'}</div>
+                        <div style="margin-top: 10px; opacity: 0.9;">Limit: 180 days ${meetsLongest ? '✓' : '✗'}</div>
                     </div>
+
+                    ${maxRolling12Months > 0 ? `
+                    <div class="result-item">
+                        <strong>Maximum in Any Rolling 12-Month Period (Post-Jan 2018)</strong>
+                        <div class="value">${maxRolling12Months} days</div>
+                        <div style="margin-top: 10px; opacity: 0.9;">Limit: 180 days ${meetsRolling ? '✓' : '✗'}</div>
+                        ${maxRollingPeriod ? `<div style="margin-top: 5px; opacity: 0.8; font-size: 14px;">Period: ${maxRollingPeriod}</div>` : ''}
+                    </div>
+                    ` : ''}
+
+                    ${maxConsecutive12Months > 0 ? `
+                    <div class="result-item">
+                        <strong>Maximum in Consecutive 12-Month Period (Pre-Jan 2018)</strong>
+                        <div class="value">${maxConsecutive12Months} days</div>
+                        <div style="margin-top: 10px; opacity: 0.9;">Limit: 180 days ${meetsConsecutive ? '✓' : '✗'}</div>
+                        ${maxConsecutivePeriod ? `<div style="margin-top: 5px; opacity: 0.8; font-size: 14px;">Period: ${maxConsecutivePeriod}</div>` : ''}
+                    </div>
+                    ` : ''}
 
                     <div class="status ${passes ? 'pass' : 'fail'}">
                         ${passes ? 'You Meet the SET(O) Absence Requirements' : 'You Do Not Meet the Requirements'}
@@ -610,8 +849,8 @@
                     ${!passes ? `
                         <div class="warning" style="margin-top: 25px; background: rgba(255, 255, 255, 0.15); border-color: #ffc107;">
                             <p style="color: white;"><strong>What This Means:</strong></p>
-                            <p style="color: white;">${!meetsTotal ? `You have exceeded the 180-day limit by ${totalDays - 180} days. ` : ''}${!meetsLongest ? `Your longest absence (${longestTrip} days) exceeds the 90-day limit. ` : ''}</p>
-                            <p style="color: white;">We strongly recommend consulting an immigration advisor to discuss your options. Please contact our team for specialist advice.</p>
+                            ${warningMessages.map(msg => `<p style="color: white;">${msg}</p>`).join('')}
+                            <p style="color: white; margin-top: 15px;">We strongly recommend consulting an immigration advisor to discuss your options. Please contact our team for specialist advice.</p>
                         </div>
                     ` : ''}
                 </div>
