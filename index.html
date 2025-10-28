@@ -605,7 +605,7 @@
                         <li><strong>No single continuous absence longer than 180 days</strong> for any leave granted after 11 January 2018</li>
                         <li><strong>Total absences must not exceed 450 days</strong> over the entire 5-year qualifying period</li>
                     </ul>
-                    <p style="margin-top: 15px;"><strong>Important:</strong> Only absences within your 5-year qualifying period count. Absences before 11 January 2018 are counted in separate consecutive 12-month periods. Absences after 11 January 2018 are calculated on a rolling basis.</p>
+                    <p style="margin-top: 15px;"><strong>Important:</strong> The 5-year qualifying period counts back from your submission date, not from fixed dates. Only absences within this period count. Absences before 11 January 2018 are counted in separate consecutive 12-month periods. Absences after 11 January 2018 are calculated on a rolling basis.</p>
                 </div>
 
                 <div class="delay-info">
@@ -622,6 +622,7 @@
                     <h4>Application Submission Date</h4>
                     <p>You can apply up to 28 days before your eligibility date. Only absences <strong>before</strong> your application submission date count toward the absence limits. Any absences after you submit your application are excluded from the calculation.</p>
                     <p><strong>Strategy:</strong> If you're close to the absence limits, you may choose to submit your application earlier (within the 28-day window) to exclude recent or upcoming trips that would push you over the allowance.</p>
+                    <p><strong>Key Point:</strong> Your 5-year qualifying period is calculated backwards from your submission date, not from your visa dates.</p>
                 </div>
 
                 <div class="permitted-reasons">
@@ -655,7 +656,7 @@
                     <label for="submissionDate">Planned ILR Application Submission Date (Optional - for planning purposes)</label>
                     <input type="date" id="submissionDate">
                     <p style="margin-top: 10px; color: #666; font-size: 14px; line-height: 1.6;">
-                        Enter any future date to plan ahead and see which absences will count. Only absences before this date will be included in the calculation. This helps you strategically plan when to submit your application.
+                        Enter any future date to plan ahead. Your 5-year qualifying period will be calculated backwards from this date. Only absences within this period and before your submission date will count. This helps you strategically plan when to submit your application.
                     </p>
                 </div>
 
@@ -720,8 +721,8 @@
                     <p><strong>Important Notes:</strong></p>
                     <p>• Both departure and arrival days count as full absence days</p>
                     <p>• You can apply up to 28 days before your eligibility date</p>
-                    <p>• Only absences before your submission date count toward limits</p>
-                    <p>• Only absences within the 5-year qualifying period count</p>
+                    <p>• Your 5-year qualifying period is calculated backwards from your submission date</p>
+                    <p>• Only absences within the qualifying period and before submission date count</p>
                     <p>• Absences before 11 January 2018 are counted in separate consecutive 12-month periods</p>
                     <p>• Absences after 11 January 2018 are calculated on a rolling 12-month basis</p>
                     <p>• Keep all travel documents (boarding passes, tickets, passport stamps) as evidence</p>
@@ -754,28 +755,28 @@
             // Calculate delay between visa issue and entry
             const delayDays = Math.floor((entryDateObj - decisionDateObj) / (1000 * 60 * 60 * 24));
 
-            let qualifyingPeriodStart;
-            let eligibilityDate;
+            let baseQualifyingStart;
+            let baseEligibilityDate;
             let earliestApplicationDate;
             let warningMessage = '';
             let boxClass = 'eligibility-box';
 
             if (delayDays <= 180) {
-                qualifyingPeriodStart = new Date(decisionDateObj);
-                eligibilityDate = new Date(decisionDateObj);
-                eligibilityDate.setFullYear(eligibilityDate.getFullYear() + 5);
+                baseQualifyingStart = new Date(decisionDateObj);
+                baseEligibilityDate = new Date(decisionDateObj);
+                baseEligibilityDate.setFullYear(baseEligibilityDate.getFullYear() + 5);
                 
-                warningMessage = `Your delay between visa issue and UK entry was ${delayDays} days (within the 180-day allowance). The qualifying period starts from your visa issue date, and any absences between visa issue and entry count toward your 180-day limit.`;
+                warningMessage = `Your delay between visa issue and UK entry was ${delayDays} days (within the 180-day allowance). The qualifying period can start from your visa issue date, and any absences between visa issue and entry count toward your 180-day limit.`;
             } else {
-                qualifyingPeriodStart = new Date(entryDateObj);
-                eligibilityDate = new Date(entryDateObj);
-                eligibilityDate.setFullYear(eligibilityDate.getFullYear() + 5);
+                baseQualifyingStart = new Date(entryDateObj);
+                baseEligibilityDate = new Date(entryDateObj);
+                baseEligibilityDate.setFullYear(baseEligibilityDate.getFullYear() + 5);
                 
-                warningMessage = `Your delay between visa issue and UK entry was ${delayDays} days (more than 180 days). Therefore, the qualifying period starts from your UK entry date, not the visa issue date.`;
+                warningMessage = `Your delay between visa issue and UK entry was ${delayDays} days (more than 180 days). Therefore, the qualifying period must start from your UK entry date, not the visa issue date.`;
                 boxClass = 'eligibility-box warning';
             }
 
-            earliestApplicationDate = new Date(eligibilityDate);
+            earliestApplicationDate = new Date(baseEligibilityDate);
             earliestApplicationDate.setDate(earliestApplicationDate.getDate() - 28);
 
             const today = new Date();
@@ -783,11 +784,11 @@
 
             let statusMessage = '';
             if (today >= earliestApplicationDate) {
-                statusMessage = '✓ You can apply for SET(O) now!';
+                statusMessage = '✓ You can apply for SET(O) now (based on visa dates)!';
                 boxClass = 'eligibility-box';
             } else {
                 const daysUntilEarliestApp = Math.ceil((earliestApplicationDate - today) / (1000 * 60 * 60 * 24));
-                statusMessage = `You cannot apply yet. You can apply from ${formatDate(earliestApplicationDate)} (in ${daysUntilEarliestApp} days).`;
+                statusMessage = `You cannot apply yet based on visa dates. You can apply from ${formatDate(earliestApplicationDate)} (in ${daysUntilEarliestApp} days).`;
                 boxClass = 'eligibility-box error';
             }
 
@@ -795,12 +796,13 @@
             eligibilityDiv.className = boxClass;
             eligibilityDiv.classList.remove('hidden');
             eligibilityDiv.innerHTML = `
-                <h4>Your Eligibility Timeline</h4>
-                <p><strong>Qualifying Period Starts:</strong> ${formatDate(qualifyingPeriodStart)}</p>
-                <p><strong>Eligibility Date (5 years):</strong> ${formatDate(eligibilityDate)}</p>
+                <h4>Your Base Eligibility Timeline (Based on Visa Dates)</h4>
+                <p><strong>Base Qualifying Period Start:</strong> ${formatDate(baseQualifyingStart)}</p>
+                <p><strong>Base Eligibility Date (5 years from visa):</strong> ${formatDate(baseEligibilityDate)}</p>
                 <p><strong>Earliest Application Date (28 days before):</strong> ${formatDate(earliestApplicationDate)}</p>
                 <p style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1);"><strong>${statusMessage}</strong></p>
                 ${delayDays !== 0 ? `<p style="margin-top: 15px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 0;">${warningMessage}</p>` : ''}
+                <p style="margin-top: 15px; padding: 12px; background: rgba(33, 150, 243, 0.1); border-radius: 0; color: #0d47a1;"><strong>Note:</strong> If you enter a planned submission date below, the actual qualifying period will be calculated backwards from that date (5 years before submission).</p>
             `;
 
             // Show submission date field
@@ -810,10 +812,12 @@
             const submissionDateInput = document.getElementById('submissionDate');
             submissionDateInput.min = earliestApplicationDate.toISOString().split('T')[0];
 
-            window.qualifyingPeriodStart = qualifyingPeriodStart;
-            window.eligibilityDate = eligibilityDate;
+            window.baseQualifyingStart = baseQualifyingStart;
+            window.baseEligibilityDate = baseEligibilityDate;
             window.earliestApplicationDate = earliestApplicationDate;
             window.delayDays = delayDays;
+            window.decisionDateObj = decisionDateObj;
+            window.entryDateObj = entryDateObj;
 
             updateSubmissionInfo();
             displayTrips();
@@ -826,6 +830,8 @@
             if (!submissionDate || !window.earliestApplicationDate) {
                 submissionInfoDiv.classList.add('hidden');
                 window.submissionDateObj = null;
+                window.qualifyingPeriodStart = window.baseQualifyingStart;
+                window.eligibilityDate = window.baseEligibilityDate;
                 displayTrips();
                 return;
             }
@@ -838,15 +844,30 @@
                 submissionInfoDiv.classList.remove('hidden');
                 submissionInfoDiv.innerHTML = `
                     <h4>Invalid Submission Date</h4>
-                    <p>Your planned submission date cannot be before ${formatDate(earliestApp)} (28 days before your eligibility date).</p>
+                    <p>Your planned submission date cannot be before ${formatDate(earliestApp)} (28 days before your base eligibility date).</p>
                     <p>Please select a date on or after this earliest application date.</p>
                 `;
                 window.submissionDateObj = null;
+                window.qualifyingPeriodStart = window.baseQualifyingStart;
+                window.eligibilityDate = window.baseEligibilityDate;
                 displayTrips();
                 return;
             }
 
-            const eligibility = window.eligibilityDate;
+            // Calculate the qualifying period backwards from submission date
+            const actualQualifyingStart = new Date(submissionDateObj);
+            actualQualifyingStart.setFullYear(actualQualifyingStart.getFullYear() - 5);
+
+            // Check if delay affects the qualifying period
+            let effectiveQualifyingStart;
+            if (window.delayDays <= 180) {
+                // Can use visa issue date if it's later than calculated start
+                effectiveQualifyingStart = window.decisionDateObj > actualQualifyingStart ? window.decisionDateObj : actualQualifyingStart;
+            } else {
+                // Must use entry date if it's later than calculated start
+                effectiveQualifyingStart = window.entryDateObj > actualQualifyingStart ? window.entryDateObj : actualQualifyingStart;
+            }
+
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
@@ -855,23 +876,26 @@
 
             if (submissionDateObj < today) {
                 statusText = `<p style="margin-top: 10px; padding: 12px; background: rgba(255, 193, 7, 0.2); border-radius: 0; color: #856404;">⚠️ This date is in the past. Please select a future date for planning purposes.</p>`;
-            } else if (submissionDateObj >= earliestApp && submissionDateObj <= eligibility) {
-                const daysBeforeEligibility = Math.ceil((eligibility - submissionDateObj) / (1000 * 60 * 60 * 24));
-                statusText = `<p style="margin-top: 10px; padding: 12px; background: rgba(76, 175, 80, 0.2); border-radius: 0; color: #2e7d32;">✓ Valid submission date: ${daysBeforeEligibility} day${daysBeforeEligibility !== 1 ? 's' : ''} before your eligibility date.</p>`;
-            } else if (submissionDateObj > eligibility) {
-                const daysAfterEligibility = Math.ceil((submissionDateObj - eligibility) / (1000 * 60 * 60 * 24));
-                statusText = `<p style="margin-top: 10px; padding: 12px; background: rgba(33, 150, 243, 0.2); border-radius: 0; color: #0d47a1;">ℹ️ This date is ${daysAfterEligibility} day${daysAfterEligibility !== 1 ? 's' : ''} after your eligibility date. You can still use this for planning future absences.</p>`;
+            } else if (submissionDateObj >= earliestApp && submissionDateObj <= window.baseEligibilityDate) {
+                const daysBeforeEligibility = Math.ceil((window.baseEligibilityDate - submissionDateObj) / (1000 * 60 * 60 * 24));
+                statusText = `<p style="margin-top: 10px; padding: 12px; background: rgba(76, 175, 80, 0.2); border-radius: 0; color: #2e7d32;">✓ Valid submission date: ${daysBeforeEligibility} day${daysBeforeEligibility !== 1 ? 's' : ''} before your base eligibility date.</p>`;
+            } else if (submissionDateObj > window.baseEligibilityDate) {
+                const daysAfterEligibility = Math.ceil((submissionDateObj - window.baseEligibilityDate) / (1000 * 60 * 60 * 24));
+                statusText = `<p style="margin-top: 10px; padding: 12px; background: rgba(33, 150, 243, 0.2); border-radius: 0; color: #0d47a1;">ℹ️ This date is ${daysAfterEligibility} day${daysAfterEligibility !== 1 ? 's' : ''} after your base eligibility date. You can still use this for planning future absences.</p>`;
             }
 
             submissionInfoDiv.className = boxClass;
             submissionInfoDiv.classList.remove('hidden');
             submissionInfoDiv.innerHTML = `
                 <h4>Planned Submission Date: ${formatDate(submissionDateObj)}</h4>
-                <p><strong>Important:</strong> Only absences ending before ${formatDate(submissionDateObj)} will count toward your absence limits. Any trips starting on or after this date will be excluded from calculations.</p>
+                <p><strong>Actual 5-Year Qualifying Period:</strong> ${formatDate(effectiveQualifyingStart)} to ${formatDate(submissionDateObj)}</p>
+                <p style="margin-top: 10px;"><strong>Important:</strong> Only absences within this qualifying period and ending before ${formatDate(submissionDateObj)} will count toward your absence limits.</p>
                 ${statusText}
             `;
 
             window.submissionDateObj = submissionDateObj;
+            window.qualifyingPeriodStart = effectiveQualifyingStart;
+            window.eligibilityDate = submissionDateObj;
             displayTrips();
         }
 
@@ -930,7 +954,7 @@
                 return false;
             }
 
-            return tripReturn < window.qualifyingPeriodStart;
+            return tripReturn < window.qualifyingPeriodStart || tripDepart >= window.eligibilityDate;
         }
 
         function isAfterSubmission(trip) {
@@ -1011,6 +1035,11 @@
             const tripsInPeriod = trips.filter(trip => {
                 // Check if after submission
                 if (isAfterSubmission(trip)) {
+                    return false;
+                }
+
+                // Check if outside qualifying period
+                if (isOutsideQualifyingPeriod(trip)) {
                     return false;
                 }
 
@@ -1157,16 +1186,17 @@
                 <div class="results">
                     <h3>Your Absence Summary${window.submissionDateObj ? ' (Based on Planned Submission Date)' : ''}</h3>
                     
-                    <div class="result-item">
-                        <strong>Qualifying Period</strong>
+                    <div class="result-item" style="background: rgba(33, 150, 243, 0.2); border-color: #2196f3;">
+                        <strong>Your Actual Qualifying Period</strong>
                         <div class="sub-value">${formatDate(qualifyingPeriodStart)} to ${formatDate(eligibilityDate)}</div>
+                        <div style="margin-top: 10px; opacity: 0.9; font-size: 14px;">${window.submissionDateObj ? 'Calculated backwards 5 years from your planned submission date' : 'Based on your visa grant date'}</div>
                     </div>
 
                     ${window.submissionDateObj ? `
                     <div class="result-item" style="background: rgba(33, 150, 243, 0.2); border-color: #2196f3;">
                         <strong>Calculation Based on ${submissionInFuture ? 'Planned' : ''} Submission Date</strong>
                         <div class="sub-value">${formatDate(submissionDate)}</div>
-                        <div style="margin-top: 10px; opacity: 0.9; font-size: 14px;">Only absences before this date are counted</div>
+                        <div style="margin-top: 10px; opacity: 0.9; font-size: 14px;">Only absences within the qualifying period and before this date are counted</div>
                     </div>
                     ` : ''}
 
@@ -1182,7 +1212,7 @@
                     <div class="result-item" style="background: rgba(255, 193, 7, 0.2); border-color: #ffc107;">
                         <strong>Excluded Absences (Outside Qualifying Period)</strong>
                         <div class="value">${excludedTrips.filter(t => !isAfterSubmission(t)).length}</div>
-                        <div class="sub-value">These absences are before your qualifying period and are not counted</div>
+                        <div class="sub-value">These absences are outside your 5-year qualifying period and are not counted</div>
                     </div>
                     ` : ''}
 
@@ -1238,7 +1268,7 @@
 
                     ${!passes && window.submissionDateObj && submissionInFuture ? `
                         <div class="warning" style="margin-top: 25px; background: rgba(255, 193, 7, 0.2); border-color: #ffc107;">
-                            <p style="color: #856404;"><strong>Planning Tip:</strong> You may want to adjust your planned submission date to exclude additional trips and meet the requirements. Try selecting an earlier date to see if it helps you pass.</p>
+                            <p style="color: #856404;"><strong>Planning Tip:</strong> You may want to adjust your planned submission date to change your qualifying period and exclude certain trips. Try selecting a different date to see if it helps you meet the requirements.</p>
                         </div>
                     ` : ''}
 
@@ -1252,7 +1282,7 @@
 
                     ${passes && window.submissionDateObj && submissionInFuture ? `
                         <div class="warning" style="margin-top: 25px; background: rgba(76, 175, 80, 0.2); border-color: #4caf50;">
-                            <p style="color: #2e7d32;"><strong>Success!</strong> Based on your planned submission date of ${formatDate(submissionDate)}, you meet all absence requirements. You can plan your trips accordingly!</p>
+                            <p style="color: #2e7d32;"><strong>Success!</strong> Based on your planned submission date of ${formatDate(submissionDate)}, your qualifying period is ${formatDate(qualifyingPeriodStart)} to ${formatDate(submissionDate)}, and you meet all absence requirements. You can plan your trips accordingly!</p>
                         </div>
                     ` : ''}
                 </div>
@@ -1273,9 +1303,13 @@
                 document.getElementById('results').classList.add('hidden');
                 window.qualifyingPeriodStart = null;
                 window.eligibilityDate = null;
+                window.baseQualifyingStart = null;
+                window.baseEligibilityDate = null;
                 window.earliestApplicationDate = null;
                 window.delayDays = null;
                 window.submissionDateObj = null;
+                window.decisionDateObj = null;
+                window.entryDateObj = null;
                 displayTrips();
                 clearForm();
             }
