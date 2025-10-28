@@ -569,6 +569,27 @@
             line-height: 1.6;
             font-size: 14px;
         }
+
+        .planning-box {
+            background: #e3f2fd;
+            border-left: 3px solid #2196f3;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .planning-box h4 {
+            color: #1565c0;
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        .planning-box p {
+            color: #0d47a1;
+            line-height: 1.8;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
     </style>
 </head>
 <body>
@@ -631,10 +652,10 @@
                 <div id="eligibilityInfo" class="hidden"></div>
 
                 <div class="form-group" id="submissionDateGroup" class="hidden">
-                    <label for="submissionDate">Planned ILR Application Submission Date (Optional)</label>
+                    <label for="submissionDate">Planned ILR Application Submission Date (Optional - for planning purposes)</label>
                     <input type="date" id="submissionDate">
                     <p style="margin-top: 10px; color: #666; font-size: 14px; line-height: 1.6;">
-                        Enter your planned submission date to see which absences will count. Only absences before this date will be included in the calculation. You can submit up to 28 days before your eligibility date.
+                        Enter any future date to plan ahead and see which absences will count. Only absences before this date will be included in the calculation. This helps you strategically plan when to submit your application.
                     </p>
                 </div>
 
@@ -785,10 +806,9 @@
             // Show submission date field
             document.getElementById('submissionDateGroup').classList.remove('hidden');
             
-            // Set min and max for submission date
+            // Set minimum date for submission to be the earliest application date
             const submissionDateInput = document.getElementById('submissionDate');
             submissionDateInput.min = earliestApplicationDate.toISOString().split('T')[0];
-            submissionDateInput.max = eligibilityDate.toISOString().split('T')[0];
 
             window.qualifyingPeriodStart = qualifyingPeriodStart;
             window.eligibilityDate = eligibilityDate;
@@ -803,7 +823,7 @@
             const submissionDate = document.getElementById('submissionDate').value;
             const submissionInfoDiv = document.getElementById('submissionInfo');
 
-            if (!submissionDate || !window.earliestApplicationDate || !window.eligibilityDate) {
+            if (!submissionDate || !window.earliestApplicationDate) {
                 submissionInfoDiv.classList.add('hidden');
                 window.submissionDateObj = null;
                 displayTrips();
@@ -812,28 +832,43 @@
 
             const submissionDateObj = new Date(submissionDate);
             const earliestApp = window.earliestApplicationDate;
-            const eligibility = window.eligibilityDate;
 
-            if (submissionDateObj < earliestApp || submissionDateObj > eligibility) {
+            if (submissionDateObj < earliestApp) {
                 submissionInfoDiv.className = 'eligibility-box error';
                 submissionInfoDiv.classList.remove('hidden');
                 submissionInfoDiv.innerHTML = `
                     <h4>Invalid Submission Date</h4>
-                    <p>Your submission date must be between ${formatDate(earliestApp)} and ${formatDate(eligibility)}.</p>
+                    <p>Your planned submission date cannot be before ${formatDate(earliestApp)} (28 days before your eligibility date).</p>
+                    <p>Please select a date on or after this earliest application date.</p>
                 `;
                 window.submissionDateObj = null;
                 displayTrips();
                 return;
             }
 
-            const daysBeforeEligibility = Math.ceil((eligibility - submissionDateObj) / (1000 * 60 * 60 * 24));
+            const eligibility = window.eligibilityDate;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
-            submissionInfoDiv.className = 'eligibility-box';
+            let boxClass = 'planning-box';
+            let statusText = '';
+
+            if (submissionDateObj < today) {
+                statusText = `<p style="margin-top: 10px; padding: 12px; background: rgba(255, 193, 7, 0.2); border-radius: 0; color: #856404;">⚠️ This date is in the past. Please select a future date for planning purposes.</p>`;
+            } else if (submissionDateObj >= earliestApp && submissionDateObj <= eligibility) {
+                const daysBeforeEligibility = Math.ceil((eligibility - submissionDateObj) / (1000 * 60 * 60 * 24));
+                statusText = `<p style="margin-top: 10px; padding: 12px; background: rgba(76, 175, 80, 0.2); border-radius: 0; color: #2e7d32;">✓ Valid submission date: ${daysBeforeEligibility} day${daysBeforeEligibility !== 1 ? 's' : ''} before your eligibility date.</p>`;
+            } else if (submissionDateObj > eligibility) {
+                const daysAfterEligibility = Math.ceil((submissionDateObj - eligibility) / (1000 * 60 * 60 * 24));
+                statusText = `<p style="margin-top: 10px; padding: 12px; background: rgba(33, 150, 243, 0.2); border-radius: 0; color: #0d47a1;">ℹ️ This date is ${daysAfterEligibility} day${daysAfterEligibility !== 1 ? 's' : ''} after your eligibility date. You can still use this for planning future absences.</p>`;
+            }
+
+            submissionInfoDiv.className = boxClass;
             submissionInfoDiv.classList.remove('hidden');
             submissionInfoDiv.innerHTML = `
                 <h4>Planned Submission Date: ${formatDate(submissionDateObj)}</h4>
-                <p>You are planning to submit ${daysBeforeEligibility} day${daysBeforeEligibility !== 1 ? 's' : ''} before your eligibility date.</p>
-                <p style="margin-top: 10px;"><strong>Important:</strong> Only absences ending before ${formatDate(submissionDateObj)} will count toward your absence limits. Any trips after this date will be excluded from calculations.</p>
+                <p><strong>Important:</strong> Only absences ending before ${formatDate(submissionDateObj)} will count toward your absence limits. Any trips starting on or after this date will be excluded from calculations.</p>
+                ${statusText}
             `;
 
             window.submissionDateObj = submissionDateObj;
@@ -1114,9 +1149,13 @@
             if (!meetsConsecutive && maxConsecutive12Months > 0) warningMessages.push(`You exceeded the 180-day consecutive 12-month limit for pre-Jan 2018 absences (${maxConsecutive12Months} days in period: ${maxConsecutivePeriod}).`);
             if (!meetsLongest) warningMessages.push(`Your longest single absence (${longestTrip} days) exceeds the 180-day limit.`);
 
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const submissionInFuture = submissionDate > today;
+
             resultsDiv.innerHTML = `
                 <div class="results">
-                    <h3>Your Absence Summary</h3>
+                    <h3>Your Absence Summary${window.submissionDateObj ? ' (Based on Planned Submission Date)' : ''}</h3>
                     
                     <div class="result-item">
                         <strong>Qualifying Period</strong>
@@ -1124,8 +1163,8 @@
                     </div>
 
                     ${window.submissionDateObj ? `
-                    <div class="result-item" style="background: rgba(233, 30, 99, 0.2); border-color: #e91e63;">
-                        <strong>Calculation Based on Submission Date</strong>
+                    <div class="result-item" style="background: rgba(33, 150, 243, 0.2); border-color: #2196f3;">
+                        <strong>Calculation Based on ${submissionInFuture ? 'Planned' : ''} Submission Date</strong>
                         <div class="sub-value">${formatDate(submissionDate)}</div>
                         <div style="margin-top: 10px; opacity: 0.9; font-size: 14px;">Only absences before this date are counted</div>
                     </div>
@@ -1194,11 +1233,12 @@
 
                     <div class="status ${passes ? 'pass' : 'fail'}">
                         ${passes ? '✓ You Meet the SET(O) Absence Requirements' : '✗ You Do Not Meet the Requirements'}
+                        ${window.submissionDateObj && submissionInFuture ? ' (Based on Planned Submission)' : ''}
                     </div>
 
-                    ${!passes && window.submissionDateObj ? `
+                    ${!passes && window.submissionDateObj && submissionInFuture ? `
                         <div class="warning" style="margin-top: 25px; background: rgba(255, 193, 7, 0.2); border-color: #ffc107;">
-                            <p style="color: #856404;"><strong>Tip:</strong> You may want to adjust your submission date to exclude additional trips and meet the requirements. Try submitting earlier within the 28-day window.</p>
+                            <p style="color: #856404;"><strong>Planning Tip:</strong> You may want to adjust your planned submission date to exclude additional trips and meet the requirements. Try selecting an earlier date to see if it helps you pass.</p>
                         </div>
                     ` : ''}
 
@@ -1210,9 +1250,9 @@
                         </div>
                     ` : ''}
 
-                    ${passes && window.submissionDateObj ? `
+                    ${passes && window.submissionDateObj && submissionInFuture ? `
                         <div class="warning" style="margin-top: 25px; background: rgba(76, 175, 80, 0.2); border-color: #4caf50;">
-                            <p style="color: #2e7d32;"><strong>Success!</strong> Based on your planned submission date of ${formatDate(submissionDate)}, you meet all absence requirements.</p>
+                            <p style="color: #2e7d32;"><strong>Success!</strong> Based on your planned submission date of ${formatDate(submissionDate)}, you meet all absence requirements. You can plan your trips accordingly!</p>
                         </div>
                     ` : ''}
                 </div>
