@@ -204,6 +204,11 @@
             opacity: 0.7;
         }
 
+        .trip-item.pre-entry {
+            background: #e3f2fd;
+            border-left: 3px solid #2196f3;
+        }
+
         .trip-info {
             flex: 1;
         }
@@ -236,6 +241,11 @@
             color: #856404;
         }
 
+        .trip-badge.pre-entry {
+            background: #2196f3;
+            color: white;
+        }
+
         .trip-days {
             background: #000000;
             color: white;
@@ -253,6 +263,10 @@
         .trip-days.excluded {
             background: #ffc107;
             color: #856404;
+        }
+
+        .trip-days.pre-entry {
+            background: #2196f3;
         }
 
         .remove-btn {
@@ -412,6 +426,53 @@
             color: #000000;
         }
 
+        .eligibility-box {
+            background: #e8f5e9;
+            border-left: 3px solid #4caf50;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .eligibility-box.warning {
+            background: #fff3cd;
+            border-left: 3px solid #ffc107;
+        }
+
+        .eligibility-box.error {
+            background: #f8d7da;
+            border-left: 3px solid #dc3545;
+        }
+
+        .eligibility-box h4 {
+            color: #2e7d32;
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        .eligibility-box.warning h4 {
+            color: #856404;
+        }
+
+        .eligibility-box.error h4 {
+            color: #721c24;
+        }
+
+        .eligibility-box p {
+            color: #1b5e20;
+            line-height: 1.8;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .eligibility-box.warning p {
+            color: #856404;
+        }
+
+        .eligibility-box.error p {
+            color: #721c24;
+        }
+
         .permitted-reasons {
             background: #e8f5e9;
             border-left: 3px solid #4caf50;
@@ -437,6 +498,28 @@
             line-height: 1.6;
             font-size: 14px;
         }
+
+        .delay-info {
+            background: #e3f2fd;
+            border-left: 3px solid #2196f3;
+            padding: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .delay-info h4 {
+            color: #1565c0;
+            margin-bottom: 12px;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .delay-info p {
+            color: #0d47a1;
+            margin-bottom: 8px;
+            line-height: 1.6;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -455,6 +538,16 @@
                     <p style="margin-top: 15px;"><strong>Important:</strong> Only absences within your 5-year qualifying period count. Absences before 11 January 2018 are counted in separate consecutive 12-month periods. Absences after 11 January 2018 are calculated on a rolling basis.</p>
                 </div>
 
+                <div class="delay-info">
+                    <h4>Entry Clearance to UK Entry Period</h4>
+                    <p>The period between your visa being issued and entering the UK can count toward your qualifying period, subject to these rules:</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li style="margin-bottom: 8px;">If the delay is <strong>180 days or less</strong>: The time between visa issue and UK entry counts toward the continuous period, and any absences during this time count toward the 180-day allowance.</li>
+                        <li style="margin-bottom: 8px;">If the delay is <strong>more than 180 days</strong>: Only time after entering the UK counts toward the continuous period.</li>
+                        <li style="margin-bottom: 8px;">You do not need to provide evidence for the reason for delayed entry.</li>
+                    </ul>
+                </div>
+
                 <div class="permitted-reasons">
                     <h4>Permitted Absences (These DO NOT count towards your limits):</h4>
                     <ul>
@@ -471,8 +564,8 @@
                 <h2 class="section-title">Your Immigration Timeline</h2>
                 
                 <div class="form-group">
-                    <label for="appDate">Planned SET(O) Application Date</label>
-                    <input type="date" id="appDate" required>
+                    <label for="decisionDate">Date of Last Immigration Decision (Visa Grant/Issue Date)</label>
+                    <input type="date" id="decisionDate" required>
                 </div>
 
                 <div class="form-group">
@@ -480,30 +573,22 @@
                     <input type="date" id="entryDate" required>
                 </div>
 
-                <div class="form-group">
-                    <label for="decisionDate">Date of Last Immigration Decision (Visa Grant Date)</label>
-                    <input type="date" id="decisionDate" required>
-                </div>
-
-                <div id="qualifyingPeriod" class="highlight-box hidden">
-                    <p><strong>Your 5-Year Qualifying Period:</strong></p>
-                    <p id="periodRange"></p>
-                    <p style="margin-top: 15px;"><strong>Time Since Entry:</strong> <span id="timeSinceEntry"></span></p>
-                    <p><strong>Time Since Last Decision:</strong> <span id="timeSinceDecision"></span></p>
-                    <p style="margin-top: 15px; color: #856404;" id="jan2018Notice"></p>
-                    <p style="margin-top: 15px; padding: 15px; background: #e3f2fd; border-left: 3px solid #2196f3; color: #0d47a1;">
-                        <strong>📌 Important:</strong> Only absences within the 5-year period shown above will count towards your limits. Any absences before this period will be excluded from calculations.
-                    </p>
-                </div>
+                <div id="eligibilityInfo" class="hidden"></div>
             </div>
 
             <!-- Add Trip Section -->
             <div class="section">
                 <h2 class="section-title">Record Your Absences from the UK</h2>
+                
+                <div class="info-box" style="background: #e3f2fd; border-left-color: #2196f3;">
+                    <p style="color: #0d47a1;"><strong>Note:</strong> If you were outside the UK between your visa issue date and entry date, you can record this as an absence. This period may count toward your qualifying period depending on the delay length.</p>
+                </div>
+
                 <div class="form-group">
                     <label for="reason">Reason for Absence</label>
                     <select id="reason">
                         <option value="">Select a reason...</option>
+                        <option value="Pre-Entry">Between Visa Issue and UK Entry</option>
                         <option value="Holiday">Holiday</option>
                         <option value="Business">Business Trip</option>
                         <option value="Family Emergency">Family Emergency</option>
@@ -519,12 +604,12 @@
 
                 <div class="grid-2">
                     <div class="form-group">
-                        <label for="departDate">Departure Date (Left UK)</label>
+                        <label for="departDate">Departure Date (Left UK) / Start of Absence</label>
                         <input type="date" id="departDate">
                     </div>
 
                     <div class="form-group">
-                        <label for="returnDate">Return Date (Entered UK)</label>
+                        <label for="returnDate">Return Date (Entered UK) / End of Absence</label>
                         <input type="date" id="returnDate">
                     </div>
                 </div>
@@ -548,6 +633,7 @@
                 <div class="warning">
                     <p><strong>Important Notes:</strong></p>
                     <p>• Both departure and arrival days count as full absence days</p>
+                    <p>• You can apply up to 28 days before your eligibility date</p>
                     <p>• Only absences within the 5-year qualifying period count</p>
                     <p>• Absences before 11 January 2018 are counted in separate consecutive 12-month periods</p>
                     <p>• Absences after 11 January 2018 are calculated on a rolling 12-month basis</p>
@@ -564,55 +650,84 @@
         let trips = [];
         const JAN_11_2018 = new Date('2018-01-11');
 
-        function updateQualifyingPeriod() {
-            const entryDate = document.getElementById('entryDate').value;
+        function calculateEligibilityDates() {
             const decisionDate = document.getElementById('decisionDate').value;
-            const appDate = document.getElementById('appDate').value;
+            const entryDate = document.getElementById('entryDate').value;
 
-            if (appDate) {
-                const appDateObj = new Date(appDate);
-                const fiveYearsAgo = new Date(appDateObj);
-                fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
-                fiveYearsAgo.setDate(fiveYearsAgo.getDate() + 1);
-
-                const periodDiv = document.getElementById('qualifyingPeriod');
-                const rangeP = document.getElementById('periodRange');
-                const jan2018Notice = document.getElementById('jan2018Notice');
-                
-                periodDiv.classList.remove('hidden');
-                rangeP.innerHTML = `<strong>${formatDate(fiveYearsAgo)}</strong> to <strong>${formatDate(appDateObj)}</strong>`;
-
-                // Check if qualifying period spans the Jan 11, 2018 date
-                if (fiveYearsAgo < JAN_11_2018 && appDateObj >= JAN_11_2018) {
-                    jan2018Notice.textContent = '⚠️ Your qualifying period includes time both before and after 11 January 2018. Different calculation methods apply to each period.';
-                } else if (fiveYearsAgo < JAN_11_2018) {
-                    jan2018Notice.textContent = '⚠️ Your qualifying period is entirely before 11 January 2018. Absences will be counted in consecutive 12-month periods.';
-                } else {
-                    jan2018Notice.textContent = '✓ Your qualifying period is after 11 January 2018. Absences will be calculated on a rolling 12-month basis.';
-                }
-
-                if (entryDate) {
-                    const entryDateObj = new Date(entryDate);
-                    const daysSinceEntry = Math.floor((appDateObj - entryDateObj) / (1000 * 60 * 60 * 24));
-                    const yearsSinceEntry = (daysSinceEntry / 365).toFixed(1);
-                    document.getElementById('timeSinceEntry').textContent = `${daysSinceEntry} days (${yearsSinceEntry} years)`;
-                }
-
-                if (decisionDate) {
-                    const decisionDateObj = new Date(decisionDate);
-                    const daysSinceDecision = Math.floor((appDateObj - decisionDateObj) / (1000 * 60 * 60 * 24));
-                    const yearsSinceDecision = (daysSinceDecision / 365).toFixed(1);
-                    document.getElementById('timeSinceDecision').textContent = `${daysSinceDecision} days (${yearsSinceDecision} years)`;
-                }
-
-                // Update the trips display to show which are outside the period
-                displayTrips();
+            if (!decisionDate || !entryDate) {
+                document.getElementById('eligibilityInfo').classList.add('hidden');
+                return;
             }
+
+            const decisionDateObj = new Date(decisionDate);
+            const entryDateObj = new Date(entryDate);
+
+            // Calculate delay between visa issue and entry
+            const delayDays = Math.floor((entryDateObj - decisionDateObj) / (1000 * 60 * 60 * 24));
+
+            let qualifyingPeriodStart;
+            let eligibilityDate;
+            let earliestApplicationDate;
+            let warningMessage = '';
+            let boxClass = 'eligibility-box';
+
+            if (delayDays <= 180) {
+                // Delay is 180 days or less - qualifying period starts from decision date
+                qualifyingPeriodStart = new Date(decisionDateObj);
+                eligibilityDate = new Date(decisionDateObj);
+                eligibilityDate.setFullYear(eligibilityDate.getFullYear() + 5);
+                
+                warningMessage = `Your delay between visa issue and UK entry was ${delayDays} days (within the 180-day allowance). The qualifying period starts from your visa issue date, and any absences between visa issue and entry count toward your 180-day limit.`;
+            } else {
+                // Delay is more than 180 days - qualifying period starts from entry date
+                qualifyingPeriodStart = new Date(entryDateObj);
+                eligibilityDate = new Date(entryDateObj);
+                eligibilityDate.setFullYear(eligibilityDate.getFullYear() + 5);
+                
+                warningMessage = `Your delay between visa issue and UK entry was ${delayDays} days (more than 180 days). Therefore, the qualifying period starts from your UK entry date, not the visa issue date.`;
+                boxClass = 'eligibility-box warning';
+            }
+
+            // Calculate earliest application date (28 days before eligibility)
+            earliestApplicationDate = new Date(eligibilityDate);
+            earliestApplicationDate.setDate(earliestApplicationDate.getDate() - 28);
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            let statusMessage = '';
+            if (today >= earliestApplicationDate) {
+                statusMessage = '✓ You can apply for SET(O) now!';
+                boxClass = 'eligibility-box';
+            } else {
+                const daysUntilEarliestApp = Math.ceil((earliestApplicationDate - today) / (1000 * 60 * 60 * 24));
+                statusMessage = `You cannot apply yet. You can apply from ${formatDate(earliestApplicationDate)} (in ${daysUntilEarliestApp} days).`;
+                boxClass = 'eligibility-box error';
+            }
+
+            const eligibilityDiv = document.getElementById('eligibilityInfo');
+            eligibilityDiv.className = boxClass;
+            eligibilityDiv.classList.remove('hidden');
+            eligibilityDiv.innerHTML = `
+                <h4>Your Eligibility Timeline</h4>
+                <p><strong>Qualifying Period Starts:</strong> ${formatDate(qualifyingPeriodStart)}</p>
+                <p><strong>Eligibility Date (5 years):</strong> ${formatDate(eligibilityDate)}</p>
+                <p><strong>Earliest Application Date (28 days before):</strong> ${formatDate(earliestApplicationDate)}</p>
+                <p style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1);"><strong>${statusMessage}</strong></p>
+                ${delayDays !== 0 ? `<p style="margin-top: 15px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 0;">${warningMessage}</p>` : ''}
+            `;
+
+            // Store these for later use in calculations
+            window.qualifyingPeriodStart = qualifyingPeriodStart;
+            window.eligibilityDate = eligibilityDate;
+            window.delayDays = delayDays;
+
+            // Update trips display
+            displayTrips();
         }
 
-        document.getElementById('entryDate').addEventListener('change', updateQualifyingPeriod);
-        document.getElementById('decisionDate').addEventListener('change', updateQualifyingPeriod);
-        document.getElementById('appDate').addEventListener('change', updateQualifyingPeriod);
+        document.getElementById('decisionDate').addEventListener('change', calculateEligibilityDates);
+        document.getElementById('entryDate').addEventListener('change', calculateEligibilityDates);
 
         function formatDate(date) {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -646,7 +761,8 @@
                 departDate,
                 returnDate,
                 days,
-                isPermitted
+                isPermitted,
+                isPreEntry: reason === 'Pre-Entry'
             };
 
             trips.push(trip);
@@ -655,18 +771,18 @@
         }
 
         function isOutsideQualifyingPeriod(trip) {
-            const appDate = document.getElementById('appDate').value;
-            if (!appDate) return false;
-
-            const appDateObj = new Date(appDate);
-            const fiveYearsAgo = new Date(appDateObj);
-            fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
-            fiveYearsAgo.setDate(fiveYearsAgo.getDate() + 1);
+            if (!window.qualifyingPeriodStart || !window.eligibilityDate) return false;
 
             const tripReturn = new Date(trip.returnDate);
+            const tripDepart = new Date(trip.departDate);
             
             // If the trip ended before the qualifying period started, it's outside
-            return tripReturn < fiveYearsAgo;
+            // Unless it's a pre-entry trip and delay is <= 180 days
+            if (trip.isPreEntry && window.delayDays <= 180) {
+                return false; // Pre-entry trips within 180-day delay count
+            }
+
+            return tripReturn < window.qualifyingPeriodStart;
         }
 
         function displayTrips() {
@@ -680,15 +796,16 @@
             list.innerHTML = trips.map(trip => {
                 const outsidePeriod = isOutsideQualifyingPeriod(trip);
                 return `
-                <div class="trip-item ${trip.isPermitted ? 'permitted' : ''} ${outsidePeriod ? 'outside-period' : ''}">
+                <div class="trip-item ${trip.isPermitted ? 'permitted' : ''} ${outsidePeriod ? 'outside-period' : ''} ${trip.isPreEntry && !outsidePeriod ? 'pre-entry' : ''}">
                     <div class="trip-info">
                         <strong>${trip.reason}</strong>
                         <span>${formatDate(new Date(trip.departDate))} → ${formatDate(new Date(trip.returnDate))}</span>
                         ${trip.isPermitted ? '<div class="trip-badge">PERMITTED ABSENCE</div>' : ''}
-                        ${outsidePeriod ? '<div class="trip-badge excluded">OUTSIDE 5-YEAR PERIOD - EXCLUDED</div>' : ''}
+                        ${trip.isPreEntry && !outsidePeriod ? '<div class="trip-badge pre-entry">PRE-ENTRY PERIOD</div>' : ''}
+                        ${outsidePeriod ? '<div class="trip-badge excluded">OUTSIDE QUALIFYING PERIOD - EXCLUDED</div>' : ''}
                     </div>
                     <div style="display: flex; align-items: center; gap: 15px;">
-                        <div class="trip-days ${trip.isPermitted ? 'permitted' : ''} ${outsidePeriod ? 'excluded' : ''}">${trip.days} days</div>
+                        <div class="trip-days ${trip.isPermitted ? 'permitted' : ''} ${outsidePeriod ? 'excluded' : ''} ${trip.isPreEntry && !outsidePeriod ? 'pre-entry' : ''}">${trip.days} days</div>
                         <button class="remove-btn" onclick="removeTrip(${trip.id})">Remove</button>
                     </div>
                 </div>
@@ -709,17 +826,16 @@
         }
 
         function calculate() {
-            const appDate = document.getElementById('appDate').value;
-            const entryDate = document.getElementById('entryDate').value;
             const decisionDate = document.getElementById('decisionDate').value;
+            const entryDate = document.getElementById('entryDate').value;
 
-            if (!appDate) {
-                alert('Please enter your planned application date first');
+            if (!decisionDate || !entryDate) {
+                alert('Please enter your visa decision date and UK entry date first');
                 return;
             }
 
-            if (!entryDate || !decisionDate) {
-                alert('Please enter your date of entry and date of last immigration decision');
+            if (!window.qualifyingPeriodStart || !window.eligibilityDate) {
+                alert('Please ensure all dates are entered correctly');
                 return;
             }
 
@@ -728,18 +844,19 @@
                 return;
             }
 
-            const appDateObj = new Date(appDate);
-            const fiveYearsAgo = new Date(appDateObj);
-            fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
-            fiveYearsAgo.setDate(fiveYearsAgo.getDate() + 1);
+            const qualifyingPeriodStart = window.qualifyingPeriodStart;
+            const eligibilityDate = window.eligibilityDate;
 
-            // Filter trips to only include those within the 5-year qualifying period
+            // Filter trips to only include those within the qualifying period
             const tripsInPeriod = trips.filter(trip => {
+                if (trip.isPreEntry && window.delayDays <= 180) {
+                    return true; // Include pre-entry trips if delay <= 180 days
+                }
+                
                 const tripReturn = new Date(trip.returnDate);
                 const tripDepart = new Date(trip.departDate);
                 
-                // Include trip if any part of it falls within the qualifying period
-                return tripReturn >= fiveYearsAgo && tripDepart <= appDateObj;
+                return tripReturn >= qualifyingPeriodStart && tripDepart <= eligibilityDate;
             });
 
             // Adjust days for trips that partially overlap with the qualifying period
@@ -747,13 +864,9 @@
                 const tripDepart = new Date(trip.departDate);
                 const tripReturn = new Date(trip.returnDate);
                 
-                // Adjust start date if trip started before qualifying period
-                const effectiveStart = tripDepart < fiveYearsAgo ? fiveYearsAgo : tripDepart;
+                const effectiveStart = tripDepart < qualifyingPeriodStart ? qualifyingPeriodStart : tripDepart;
+                const effectiveEnd = tripReturn > eligibilityDate ? eligibilityDate : tripReturn;
                 
-                // Adjust end date if trip extends beyond application date
-                const effectiveEnd = tripReturn > appDateObj ? appDateObj : tripReturn;
-                
-                // Calculate adjusted days
                 const adjustedDays = Math.floor((effectiveEnd - effectiveStart) / (1000 * 60 * 60 * 24)) + 1;
                 
                 return {
@@ -768,9 +881,12 @@
             // Separate trips into permitted and countable
             const permittedTrips = adjustedTrips.filter(t => t.isPermitted);
             const countableTrips = adjustedTrips.filter(t => !t.isPermitted);
+            const preEntryTrips = countableTrips.filter(t => t.isPreEntry);
+            const regularTrips = countableTrips.filter(t => !t.isPreEntry);
 
             const totalPermittedDays = permittedTrips.reduce((sum, trip) => sum + trip.days, 0);
             const totalCountableDays = countableTrips.reduce((sum, trip) => sum + trip.days, 0);
+            const preEntryDays = preEntryTrips.reduce((sum, trip) => sum + trip.days, 0);
 
             // Calculate longest single absence (countable only)
             const longestTrip = countableTrips.length > 0 ? Math.max(...countableTrips.map(trip => trip.days)) : 0;
@@ -787,8 +903,7 @@
                     const twelveMonthsLater = new Date(tripStart);
                     twelveMonthsLater.setFullYear(twelveMonthsLater.getFullYear() + 1);
                     
-                    // Don't go beyond the application date
-                    const periodEnd = twelveMonthsLater > appDateObj ? appDateObj : twelveMonthsLater;
+                    const periodEnd = twelveMonthsLater > eligibilityDate ? eligibilityDate : twelveMonthsLater;
                     
                     const tripsInRollingPeriod = countableTrips.filter(t => {
                         const tStart = new Date(t.departDate);
@@ -821,7 +936,7 @@
             const preJan2018Trips = countableTrips.filter(t => new Date(t.departDate) < JAN_11_2018);
             
             if (preJan2018Trips.length > 0) {
-                let currentDate = new Date(fiveYearsAgo);
+                let currentDate = new Date(qualifyingPeriodStart);
                 while (currentDate < JAN_11_2018) {
                     const periodEnd = new Date(currentDate);
                     periodEnd.setFullYear(periodEnd.getFullYear() + 1);
@@ -874,9 +989,14 @@
                 <div class="results">
                     <h3>Your Absence Summary</h3>
                     
+                    <div class="result-item">
+                        <strong>Qualifying Period</strong>
+                        <div class="sub-value">${formatDate(qualifyingPeriodStart)} to ${formatDate(eligibilityDate)}</div>
+                    </div>
+
                     ${excludedTrips.length > 0 ? `
                     <div class="result-item" style="background: rgba(255, 193, 7, 0.2); border-color: #ffc107;">
-                        <strong>Excluded Absences (Outside 5-Year Period)</strong>
+                        <strong>Excluded Absences (Outside Qualifying Period)</strong>
                         <div class="value">${excludedTrips.length}</div>
                         <div class="sub-value">These absences are before your qualifying period and are not counted</div>
                     </div>
@@ -891,6 +1011,7 @@
                     <div class="result-item">
                         <strong>Total Countable Days Outside UK</strong>
                         <div class="value">${totalCountableDays} days</div>
+                        ${preEntryDays > 0 ? `<div class="sub-value">(includes ${preEntryDays} days pre-entry)</div>` : ''}
                         <div style="margin-top: 10px; opacity: 0.9;">Limit: 450 days over 5 years ${meetsTotal ? '✓' : '✗'}</div>
                     </div>
 
@@ -948,9 +1069,11 @@
                 trips = [];
                 document.getElementById('entryDate').value = '';
                 document.getElementById('decisionDate').value = '';
-                document.getElementById('appDate').value = '';
-                document.getElementById('qualifyingPeriod').classList.add('hidden');
+                document.getElementById('eligibilityInfo').classList.add('hidden');
                 document.getElementById('results').classList.add('hidden');
+                window.qualifyingPeriodStart = null;
+                window.eligibilityDate = null;
+                window.delayDays = null;
                 displayTrips();
                 clearForm();
             }
