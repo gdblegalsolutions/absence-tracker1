@@ -198,6 +198,12 @@
             border-left: 3px solid #4caf50;
         }
 
+        .trip-item.outside-period {
+            background: #fff3cd;
+            border-left: 3px solid #ffc107;
+            opacity: 0.7;
+        }
+
         .trip-info {
             flex: 1;
         }
@@ -225,6 +231,11 @@
             letter-spacing: 0.5px;
         }
 
+        .trip-badge.excluded {
+            background: #ffc107;
+            color: #856404;
+        }
+
         .trip-days {
             background: #000000;
             color: white;
@@ -237,6 +248,11 @@
 
         .trip-days.permitted {
             background: #4caf50;
+        }
+
+        .trip-days.excluded {
+            background: #ffc107;
+            color: #856404;
         }
 
         .remove-btn {
@@ -436,7 +452,7 @@
                         <li><strong>No single continuous absence longer than 180 days</strong> for any leave granted after 11 January 2018</li>
                         <li><strong>Total absences must not exceed 450 days</strong> over the entire 5-year qualifying period</li>
                     </ul>
-                    <p style="margin-top: 15px;"><strong>Important:</strong> Absences before 11 January 2018 are counted in separate consecutive 12-month periods. Absences after 11 January 2018 are calculated on a rolling basis.</p>
+                    <p style="margin-top: 15px;"><strong>Important:</strong> Only absences within your 5-year qualifying period count. Absences before 11 January 2018 are counted in separate consecutive 12-month periods. Absences after 11 January 2018 are calculated on a rolling basis.</p>
                 </div>
 
                 <div class="permitted-reasons">
@@ -455,6 +471,11 @@
                 <h2 class="section-title">Your Immigration Timeline</h2>
                 
                 <div class="form-group">
+                    <label for="appDate">Planned SET(O) Application Date</label>
+                    <input type="date" id="appDate" required>
+                </div>
+
+                <div class="form-group">
                     <label for="entryDate">Date of Entry to the UK</label>
                     <input type="date" id="entryDate" required>
                 </div>
@@ -464,17 +485,15 @@
                     <input type="date" id="decisionDate" required>
                 </div>
 
-                <div class="form-group">
-                    <label for="appDate">Planned SET(O) Application Date</label>
-                    <input type="date" id="appDate" required>
-                </div>
-
                 <div id="qualifyingPeriod" class="highlight-box hidden">
                     <p><strong>Your 5-Year Qualifying Period:</strong></p>
                     <p id="periodRange"></p>
                     <p style="margin-top: 15px;"><strong>Time Since Entry:</strong> <span id="timeSinceEntry"></span></p>
                     <p><strong>Time Since Last Decision:</strong> <span id="timeSinceDecision"></span></p>
                     <p style="margin-top: 15px; color: #856404;" id="jan2018Notice"></p>
+                    <p style="margin-top: 15px; padding: 15px; background: #e3f2fd; border-left: 3px solid #2196f3; color: #0d47a1;">
+                        <strong>📌 Important:</strong> Only absences within the 5-year period shown above will count towards your limits. Any absences before this period will be excluded from calculations.
+                    </p>
                 </div>
             </div>
 
@@ -529,6 +548,7 @@
                 <div class="warning">
                     <p><strong>Important Notes:</strong></p>
                     <p>• Both departure and arrival days count as full absence days</p>
+                    <p>• Only absences within the 5-year qualifying period count</p>
                     <p>• Absences before 11 January 2018 are counted in separate consecutive 12-month periods</p>
                     <p>• Absences after 11 January 2018 are calculated on a rolling 12-month basis</p>
                     <p>• Keep all travel documents (boarding passes, tickets, passport stamps) as evidence</p>
@@ -584,6 +604,9 @@
                     const yearsSinceDecision = (daysSinceDecision / 365).toFixed(1);
                     document.getElementById('timeSinceDecision').textContent = `${daysSinceDecision} days (${yearsSinceDecision} years)`;
                 }
+
+                // Update the trips display to show which are outside the period
+                displayTrips();
             }
         }
 
@@ -631,6 +654,21 @@
             clearForm();
         }
 
+        function isOutsideQualifyingPeriod(trip) {
+            const appDate = document.getElementById('appDate').value;
+            if (!appDate) return false;
+
+            const appDateObj = new Date(appDate);
+            const fiveYearsAgo = new Date(appDateObj);
+            fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+            fiveYearsAgo.setDate(fiveYearsAgo.getDate() + 1);
+
+            const tripReturn = new Date(trip.returnDate);
+            
+            // If the trip ended before the qualifying period started, it's outside
+            return tripReturn < fiveYearsAgo;
+        }
+
         function displayTrips() {
             const list = document.getElementById('tripsList');
             
@@ -639,19 +677,23 @@
                 return;
             }
 
-            list.innerHTML = trips.map(trip => `
-                <div class="trip-item ${trip.isPermitted ? 'permitted' : ''}">
+            list.innerHTML = trips.map(trip => {
+                const outsidePeriod = isOutsideQualifyingPeriod(trip);
+                return `
+                <div class="trip-item ${trip.isPermitted ? 'permitted' : ''} ${outsidePeriod ? 'outside-period' : ''}">
                     <div class="trip-info">
                         <strong>${trip.reason}</strong>
                         <span>${formatDate(new Date(trip.departDate))} → ${formatDate(new Date(trip.returnDate))}</span>
                         ${trip.isPermitted ? '<div class="trip-badge">PERMITTED ABSENCE</div>' : ''}
+                        ${outsidePeriod ? '<div class="trip-badge excluded">OUTSIDE 5-YEAR PERIOD - EXCLUDED</div>' : ''}
                     </div>
                     <div style="display: flex; align-items: center; gap: 15px;">
-                        <div class="trip-days ${trip.isPermitted ? 'permitted' : ''}">${trip.days} days</div>
+                        <div class="trip-days ${trip.isPermitted ? 'permitted' : ''} ${outsidePeriod ? 'excluded' : ''}">${trip.days} days</div>
                         <button class="remove-btn" onclick="removeTrip(${trip.id})">Remove</button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function removeTrip(id) {
@@ -691,13 +733,44 @@
             fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
             fiveYearsAgo.setDate(fiveYearsAgo.getDate() + 1);
 
+            // Filter trips to only include those within the 5-year qualifying period
+            const tripsInPeriod = trips.filter(trip => {
+                const tripReturn = new Date(trip.returnDate);
+                const tripDepart = new Date(trip.departDate);
+                
+                // Include trip if any part of it falls within the qualifying period
+                return tripReturn >= fiveYearsAgo && tripDepart <= appDateObj;
+            });
+
+            // Adjust days for trips that partially overlap with the qualifying period
+            const adjustedTrips = tripsInPeriod.map(trip => {
+                const tripDepart = new Date(trip.departDate);
+                const tripReturn = new Date(trip.returnDate);
+                
+                // Adjust start date if trip started before qualifying period
+                const effectiveStart = tripDepart < fiveYearsAgo ? fiveYearsAgo : tripDepart;
+                
+                // Adjust end date if trip extends beyond application date
+                const effectiveEnd = tripReturn > appDateObj ? appDateObj : tripReturn;
+                
+                // Calculate adjusted days
+                const adjustedDays = Math.floor((effectiveEnd - effectiveStart) / (1000 * 60 * 60 * 24)) + 1;
+                
+                return {
+                    ...trip,
+                    originalDays: trip.days,
+                    days: adjustedDays
+                };
+            });
+
+            const excludedTrips = trips.filter(trip => !tripsInPeriod.includes(trip));
+
             // Separate trips into permitted and countable
-            const permittedTrips = trips.filter(t => t.isPermitted);
-            const countableTrips = trips.filter(t => !t.isPermitted);
+            const permittedTrips = adjustedTrips.filter(t => t.isPermitted);
+            const countableTrips = adjustedTrips.filter(t => !t.isPermitted);
 
             const totalPermittedDays = permittedTrips.reduce((sum, trip) => sum + trip.days, 0);
             const totalCountableDays = countableTrips.reduce((sum, trip) => sum + trip.days, 0);
-            const totalAllDays = totalPermittedDays + totalCountableDays;
 
             // Calculate longest single absence (countable only)
             const longestTrip = countableTrips.length > 0 ? Math.max(...countableTrips.map(trip => trip.days)) : 0;
@@ -714,26 +787,29 @@
                     const twelveMonthsLater = new Date(tripStart);
                     twelveMonthsLater.setFullYear(twelveMonthsLater.getFullYear() + 1);
                     
-                    const tripsInPeriod = countableTrips.filter(t => {
+                    // Don't go beyond the application date
+                    const periodEnd = twelveMonthsLater > appDateObj ? appDateObj : twelveMonthsLater;
+                    
+                    const tripsInRollingPeriod = countableTrips.filter(t => {
                         const tStart = new Date(t.departDate);
                         const tEnd = new Date(t.returnDate);
-                        return (tStart >= tripStart && tStart < twelveMonthsLater) ||
-                               (tEnd >= tripStart && tEnd < twelveMonthsLater) ||
-                               (tStart < tripStart && tEnd >= twelveMonthsLater);
+                        return (tStart >= tripStart && tStart < periodEnd) ||
+                               (tEnd >= tripStart && tEnd < periodEnd) ||
+                               (tStart < tripStart && tEnd >= periodEnd);
                     });
                     
-                    const daysInPeriod = tripsInPeriod.reduce((sum, t) => {
+                    const daysInPeriod = tripsInRollingPeriod.reduce((sum, t) => {
                         const tStart = new Date(t.departDate);
                         const tEnd = new Date(t.returnDate);
                         const periodStart = tStart < tripStart ? tripStart : tStart;
-                        const periodEnd = tEnd > twelveMonthsLater ? twelveMonthsLater : tEnd;
-                        const days = Math.floor((periodEnd - periodStart) / (1000 * 60 * 60 * 24)) + 1;
+                        const periodEndDate = tEnd > periodEnd ? periodEnd : tEnd;
+                        const days = Math.floor((periodEndDate - periodStart) / (1000 * 60 * 60 * 24)) + 1;
                         return sum + days;
                     }, 0);
                     
                     if (daysInPeriod > maxRolling12Months) {
                         maxRolling12Months = daysInPeriod;
-                        maxRollingPeriod = `${formatDate(tripStart)} to ${formatDate(twelveMonthsLater)}`;
+                        maxRollingPeriod = `${formatDate(tripStart)} to ${formatDate(periodEnd)}`;
                     }
                 }
             }
@@ -798,9 +874,17 @@
                 <div class="results">
                     <h3>Your Absence Summary</h3>
                     
+                    ${excludedTrips.length > 0 ? `
+                    <div class="result-item" style="background: rgba(255, 193, 7, 0.2); border-color: #ffc107;">
+                        <strong>Excluded Absences (Outside 5-Year Period)</strong>
+                        <div class="value">${excludedTrips.length}</div>
+                        <div class="sub-value">These absences are before your qualifying period and are not counted</div>
+                    </div>
+                    ` : ''}
+
                     <div class="result-item">
-                        <strong>Total Number of Absences</strong>
-                        <div class="value">${trips.length}</div>
+                        <strong>Total Absences in Qualifying Period</strong>
+                        <div class="value">${tripsInPeriod.length}</div>
                         <div class="sub-value">${countableTrips.length} countable | ${permittedTrips.length} permitted</div>
                     </div>
 
@@ -843,7 +927,7 @@
                     ` : ''}
 
                     <div class="status ${passes ? 'pass' : 'fail'}">
-                        ${passes ? 'You Meet the SET(O) Absence Requirements' : 'You Do Not Meet the Requirements'}
+                        ${passes ? '✓ You Meet the SET(O) Absence Requirements' : '✗ You Do Not Meet the Requirements'}
                     </div>
 
                     ${!passes ? `
